@@ -6,8 +6,14 @@ import produce from "immer";
 import React from "react";
 import { useDeepCompareEffect, useLatest } from "react-use";
 import "./PageTabs.css";
+import {
+  clearCommandHandlers,
+  registerCommandPaletteOnce,
+} from "./commandRegistry";
 import { keyBindings } from "./settings";
+import { resolveWheelScroll } from "./tabStripWheel";
 import { ITabInfo } from "./types";
+import { attachNonPassiveWheelListener } from "./wheelListener";
 import {
   delay,
   getSourcePage,
@@ -70,7 +76,7 @@ interface TabsProps {
   onSwapTab: (tab: ITabInfo, anotherTab: ITabInfo) => void;
 }
 
-const Tabs = React.forwardRef<HTMLElement, TabsProps>(
+const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
   (
     {
       activeTab,
@@ -87,6 +93,34 @@ const Tabs = React.forwardRef<HTMLElement, TabsProps>(
     ref
   ) => {
     const [draggingTab, setDraggingTab] = React.useState<ITabInfo>();
+
+    React.useEffect(() => {
+      const element = (ref as React.RefObject<HTMLDivElement | null>)?.current;
+      if (!element) {
+        return;
+      }
+
+      const onWheel = (event: WheelEvent) => {
+        const input = {
+          scrollLeft: element.scrollLeft,
+          clientWidth: element.clientWidth,
+          scrollWidth: element.scrollWidth,
+          deltaX: event.deltaX,
+          deltaY: event.deltaY,
+          deltaMode: event.deltaMode,
+        };
+        const result = resolveWheelScroll(input);
+
+        if (!result.shouldConsume) {
+          return;
+        }
+
+        event.preventDefault();
+        element.scrollLeft = result.nextScrollLeft;
+      };
+
+      return attachNonPassiveWheelListener(element, onWheel);
+    }, [ref]);
 
     React.useEffect(() => {
       const dragEndListener = () => {
@@ -116,17 +150,20 @@ const Tabs = React.forwardRef<HTMLElement, TabsProps>(
     }
     return (
       <div
-        // @ts-expect-error ???
         ref={ref}
         data-dragging={draggingTab != null}
-        className={`logseq-tab-wrapper flex items-center h-full px-1`}
-        style={{ width: "fit-content" }}
+        className="h-full w-full overflow-x-auto overflow-y-hidden px-1"
         // By default middle button click will enter the horizontal scroll mode
         onMouseDown={(e) => {
           if (e.button === 1) e.preventDefault();
         }}
       >
-        {tabs.map((tab) => {
+        <div
+          data-dragging={draggingTab != null}
+          className="logseq-tab-wrapper flex items-center h-full"
+          style={{ width: "fit-content" }}
+        >
+          {tabs.map((tab) => {
           const isActive = isTabEqual(tab, activeTab);
           const onClose: React.MouseEventHandler = (e) => {
             e.stopPropagation();
@@ -156,13 +193,6 @@ const Tabs = React.forwardRef<HTMLElement, TabsProps>(
             <div
               onClick={(e) => onClickTab(tab, e.shiftKey)}
               onDoubleClick={() => onPinTab(tab)}
-              onContextMenu={(e) => {
-                e.preventDefault();
-                console.log(e);
-                // onAuxClick={/*onClose*/}
-                // TODO: show the same context menu like right-clicking the title?
-                console.log("Not implemented yet");
-              }}
               key={[tab.originalName, tab.uuid].join("-")}
               data-active={isActive}
               data-pinned={tab.pinned}
@@ -215,6 +245,7 @@ const Tabs = React.forwardRef<HTMLElement, TabsProps>(
             <span className="logseq-tab-title">Close All</span>
           </div>
         )}
+        </div>
       </div>
     );
   }
@@ -472,9 +503,6 @@ const sortTabs = (tabs: ITabInfo[]) => {
   });
 };
 
-// Avoid register issues during dev
-const registeredKeybindings = new Set<string>();
-
 function registerKeybinding(
   setting: {
     key: string;
@@ -483,11 +511,15 @@ function registerKeybinding(
   },
   cb: () => void
 ) {
-  if (registeredKeybindings.has(setting.key)) {
-    return;
-  }
-  registeredKeybindings.add(setting.key);
-  logseq.App.registerCommandPalette(setting, cb);
+  registerCommandPaletteOnce({
+    host: parent.window,
+    pluginId: logseq.baseInfo.id,
+    key: setting.key,
+    register: (action) => {
+      logseq.App.registerCommandPalette(setting, action);
+    },
+    handler: cb,
+  });
 }
 
 const useRegisterKeybindings = (
@@ -568,6 +600,12 @@ const useRegisterCloseAllButPins = (cb: (b: boolean) => void) => {
 };
 
 export function PageTabs(): JSX.Element {
+  React.useEffect(() => {
+    return () => {
+      clearCommandHandlers(parent.window, logseq.baseInfo.id);
+    };
+  }, []);
+
   const [tabs, setTabs] = useStoreTabs();
   const [activeTab, setActiveTab] = useActiveTab(tabs);
 
@@ -750,7 +788,7 @@ export function PageTabs(): JSX.Element {
     );
   };
 
-  const ref = React.useRef<HTMLElement>(null);
+  const ref = React.useRef<HTMLDivElement>(null);
   const scrollWidth = useScrollWidth(ref);
 
   useAdaptMainUIStyle(tabs.length > 0, scrollWidth);

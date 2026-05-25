@@ -1,10 +1,8 @@
-# Logseq Plugin Tabs
+# Logseq Plugin Tabs Scrollable
 
-### 🔔 Looking for maintainers! 🔔
+This project is a maintained fork of [`pengx17/logseq-plugin-tabs`](https://github.com/pengx17/logseq-plugin-tabs) that adds wheel scrolling for overflowing tabs while keeping the original tabbed-page workflow intact.
 
-[![Github All Releases](https://img.shields.io/github/downloads/pengx17/logseq-plugin-tabs/total.svg)](https://github.com/pengx17/logseq-plugin-tabs/releases)
-
-A plugin that let's you to manage your working pages with tabs.
+It helps you manage your working pages with tabs.
 
 UX is mainly brought from modern browsers:
 
@@ -16,6 +14,12 @@ UX is mainly brought from modern browsers:
 - tabs info will be persisted in your local storage, so that your tabs will recover even if you re-open the app
 
 ![](./demo.gif)
+
+## Fork notes
+
+- Adds wheel scrolling for overflowing tabs in the tab bar.
+- Preserves attribution to the upstream `pengx17/logseq-plugin-tabs` project.
+- Continues under the same MIT license lineage as the upstream project.
 
 ## Keyboard shortcuts
 
