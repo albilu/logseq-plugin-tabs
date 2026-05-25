@@ -7,7 +7,9 @@ import React from "react";
 import { useDeepCompareEffect, useLatest } from "react-use";
 import "./PageTabs.css";
 import { keyBindings } from "./settings";
+import { resolveWheelScroll } from "./tabStripWheel";
 import { ITabInfo } from "./types";
+import { attachNonPassiveWheelListener } from "./wheelListener";
 import {
   delay,
   getSourcePage,
@@ -70,7 +72,7 @@ interface TabsProps {
   onSwapTab: (tab: ITabInfo, anotherTab: ITabInfo) => void;
 }
 
-const Tabs = React.forwardRef<HTMLElement, TabsProps>(
+const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
   (
     {
       activeTab,
@@ -87,6 +89,34 @@ const Tabs = React.forwardRef<HTMLElement, TabsProps>(
     ref
   ) => {
     const [draggingTab, setDraggingTab] = React.useState<ITabInfo>();
+
+    React.useEffect(() => {
+      const element = (ref as React.RefObject<HTMLDivElement | null>)?.current;
+      if (!element) {
+        return;
+      }
+
+      const onWheel = (event: WheelEvent) => {
+        const input = {
+          scrollLeft: element.scrollLeft,
+          clientWidth: element.clientWidth,
+          scrollWidth: element.scrollWidth,
+          deltaX: event.deltaX,
+          deltaY: event.deltaY,
+          deltaMode: event.deltaMode,
+        };
+        const result = resolveWheelScroll(input);
+
+        if (!result.shouldConsume) {
+          return;
+        }
+
+        event.preventDefault();
+        element.scrollLeft = result.nextScrollLeft;
+      };
+
+      return attachNonPassiveWheelListener(element, onWheel);
+    }, [ref]);
 
     React.useEffect(() => {
       const dragEndListener = () => {
@@ -116,17 +146,21 @@ const Tabs = React.forwardRef<HTMLElement, TabsProps>(
     }
     return (
       <div
-        // @ts-expect-error ???
         ref={ref}
         data-dragging={draggingTab != null}
-        className={`logseq-tab-wrapper flex items-center h-full px-1`}
-        style={{ width: "fit-content" }}
+        className="h-full w-full overflow-x-auto overflow-y-hidden px-1"
+        style={{ scrollbarWidth: "none" }}
         // By default middle button click will enter the horizontal scroll mode
         onMouseDown={(e) => {
           if (e.button === 1) e.preventDefault();
         }}
       >
-        {tabs.map((tab) => {
+        <div
+          data-dragging={draggingTab != null}
+          className="logseq-tab-wrapper flex items-center h-full"
+          style={{ width: "fit-content" }}
+        >
+          {tabs.map((tab) => {
           const isActive = isTabEqual(tab, activeTab);
           const onClose: React.MouseEventHandler = (e) => {
             e.stopPropagation();
@@ -204,17 +238,18 @@ const Tabs = React.forwardRef<HTMLElement, TabsProps>(
               )}
             </div>
           );
-        })}
-        {!hideCloseAllButton && (
-          <div
-            onClick={() => onCloseAllTabs(true)}
-            key={"Close All"}
-            draggable={false}
-            className="logseq-tab close-all group"
-          >
-            <span className="logseq-tab-title">Close All</span>
-          </div>
-        )}
+          })}
+          {!hideCloseAllButton && (
+            <div
+              onClick={() => onCloseAllTabs(true)}
+              key={"Close All"}
+              draggable={false}
+              className="logseq-tab close-all group"
+            >
+              <span className="logseq-tab-title">Close All</span>
+            </div>
+          )}
+        </div>
       </div>
     );
   }
@@ -750,7 +785,7 @@ export function PageTabs(): JSX.Element {
     );
   };
 
-  const ref = React.useRef<HTMLElement>(null);
+  const ref = React.useRef<HTMLDivElement>(null);
   const scrollWidth = useScrollWidth(ref);
 
   useAdaptMainUIStyle(tabs.length > 0, scrollWidth);
