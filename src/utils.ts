@@ -6,6 +6,7 @@ import { useHoverDirty, useMountedState } from "react-use";
 import { schemaVersion } from "../package.json";
 import { ITabInfo } from "./types";
 import { inheritCustomCSSSetting } from "./settings";
+import { getStorageKeyId } from "./storageKeys";
 
 export const useAppVisible = () => {
   const [visible, setVisible] = useState(logseq.isMainUIVisible);
@@ -82,7 +83,7 @@ export const delay = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 function getKeyId(graph: string) {
-  return "logseq-plugin-tabs:" + schemaVersion + "/" + graph;
+  return getStorageKeyId(graph);
 }
 
 const readFromLocalStorage = (graph: string): ITabInfo[] | null => {
