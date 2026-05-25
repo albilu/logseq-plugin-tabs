@@ -71,20 +71,6 @@ interface TabsProps {
   onSwapTab: (tab: ITabInfo, anotherTab: ITabInfo) => void;
 }
 
-export function resolvePageTabsWheel(
-  element: Pick<HTMLDivElement, "scrollLeft" | "clientWidth" | "scrollWidth">,
-  event: Pick<React.WheelEvent<HTMLDivElement>, "deltaX" | "deltaY" | "deltaMode">
-) {
-  return resolveWheelScroll({
-    scrollLeft: element.scrollLeft,
-    clientWidth: element.clientWidth,
-    scrollWidth: element.scrollWidth,
-    deltaX: event.deltaX,
-    deltaY: event.deltaY,
-    deltaMode: event.deltaMode,
-  });
-}
-
 const Tabs = React.forwardRef<HTMLElement, TabsProps>(
   (
     {
@@ -104,7 +90,14 @@ const Tabs = React.forwardRef<HTMLElement, TabsProps>(
     const [draggingTab, setDraggingTab] = React.useState<ITabInfo>();
     const onWheel: React.WheelEventHandler<HTMLDivElement> = (event) => {
       const element = event.currentTarget;
-      const result = resolvePageTabsWheel(element, event);
+      const result = resolveWheelScroll({
+        scrollLeft: element.scrollLeft,
+        clientWidth: element.clientWidth,
+        scrollWidth: element.scrollWidth,
+        deltaX: event.deltaX,
+        deltaY: event.deltaY,
+        deltaMode: event.deltaMode,
+      });
 
       if (!result.shouldConsume) {
         return;
