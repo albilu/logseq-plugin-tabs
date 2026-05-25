@@ -26,7 +26,7 @@ function normalizeDelta(delta: number, deltaMode: number, clientWidth: number): 
   return delta;
 }
 
-export function getWheelScrollResult(input: WheelScrollInput): WheelScrollResult {
+export function resolveWheelScroll(input: WheelScrollInput): WheelScrollResult {
   const maxScrollLeft = Math.max(0, input.scrollWidth - input.clientWidth);
 
   if (maxScrollLeft === 0) {

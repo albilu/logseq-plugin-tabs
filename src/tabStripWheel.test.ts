@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { getWheelScrollResult } from "./tabStripWheel";
+import { resolveWheelScroll } from "./tabStripWheel";
 
-describe("getWheelScrollResult", () => {
+describe("resolveWheelScroll", () => {
   it("uses deltaY when vertical intent is dominant", () => {
     expect(
-      getWheelScrollResult({
+      resolveWheelScroll({
         scrollLeft: 20,
         clientWidth: 100,
         scrollWidth: 500,
@@ -21,7 +21,7 @@ describe("getWheelScrollResult", () => {
 
   it("uses deltaX when horizontal intent is dominant", () => {
     expect(
-      getWheelScrollResult({
+      resolveWheelScroll({
         scrollLeft: 100,
         clientWidth: 100,
         scrollWidth: 500,
@@ -37,7 +37,7 @@ describe("getWheelScrollResult", () => {
 
   it("does not consume when there is no overflow", () => {
     expect(
-      getWheelScrollResult({
+      resolveWheelScroll({
         scrollLeft: 0,
         clientWidth: 200,
         scrollWidth: 200,
@@ -53,7 +53,7 @@ describe("getWheelScrollResult", () => {
 
   it("does not consume when already at the left edge and moving farther left", () => {
     expect(
-      getWheelScrollResult({
+      resolveWheelScroll({
         scrollLeft: 0,
         clientWidth: 100,
         scrollWidth: 500,
@@ -69,7 +69,7 @@ describe("getWheelScrollResult", () => {
 
   it("clamps and consumes when movement is only partially available", () => {
     expect(
-      getWheelScrollResult({
+      resolveWheelScroll({
         scrollLeft: 180,
         clientWidth: 100,
         scrollWidth: 300,
@@ -85,7 +85,7 @@ describe("getWheelScrollResult", () => {
 
   it("normalizes line deltas before applying dominant axis rules", () => {
     expect(
-      getWheelScrollResult({
+      resolveWheelScroll({
         scrollLeft: 10,
         clientWidth: 100,
         scrollWidth: 500,
@@ -101,7 +101,7 @@ describe("getWheelScrollResult", () => {
 
   it("normalizes page deltas using the visible width", () => {
     expect(
-      getWheelScrollResult({
+      resolveWheelScroll({
         scrollLeft: 50,
         clientWidth: 120,
         scrollWidth: 500,
