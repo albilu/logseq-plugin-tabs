@@ -7,6 +7,7 @@ import React from "react";
 import { useDeepCompareEffect, useLatest } from "react-use";
 import "./PageTabs.css";
 import { keyBindings } from "./settings";
+import { resolveWheelScroll } from "./tabStripWheel";
 import { ITabInfo } from "./types";
 import {
   delay,
@@ -70,6 +71,20 @@ interface TabsProps {
   onSwapTab: (tab: ITabInfo, anotherTab: ITabInfo) => void;
 }
 
+export function resolvePageTabsWheel(
+  element: Pick<HTMLDivElement, "scrollLeft" | "clientWidth" | "scrollWidth">,
+  event: Pick<React.WheelEvent<HTMLDivElement>, "deltaX" | "deltaY" | "deltaMode">
+) {
+  return resolveWheelScroll({
+    scrollLeft: element.scrollLeft,
+    clientWidth: element.clientWidth,
+    scrollWidth: element.scrollWidth,
+    deltaX: event.deltaX,
+    deltaY: event.deltaY,
+    deltaMode: event.deltaMode,
+  });
+}
+
 const Tabs = React.forwardRef<HTMLElement, TabsProps>(
   (
     {
@@ -87,6 +102,17 @@ const Tabs = React.forwardRef<HTMLElement, TabsProps>(
     ref
   ) => {
     const [draggingTab, setDraggingTab] = React.useState<ITabInfo>();
+    const onWheel: React.WheelEventHandler<HTMLDivElement> = (event) => {
+      const element = event.currentTarget;
+      const result = resolvePageTabsWheel(element, event);
+
+      if (!result.shouldConsume) {
+        return;
+      }
+
+      event.preventDefault();
+      element.scrollLeft = result.nextScrollLeft;
+    };
 
     React.useEffect(() => {
       const dragEndListener = () => {
@@ -125,6 +151,7 @@ const Tabs = React.forwardRef<HTMLElement, TabsProps>(
         onMouseDown={(e) => {
           if (e.button === 1) e.preventDefault();
         }}
+        onWheel={onWheel}
       >
         {tabs.map((tab) => {
           const isActive = isTabEqual(tab, activeTab);

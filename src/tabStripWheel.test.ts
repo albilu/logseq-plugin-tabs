@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { resolvePageTabsWheel } from "./PageTabs";
 import { resolveWheelScroll } from "./tabStripWheel";
 
 describe("resolveWheelScroll", () => {
@@ -111,6 +112,26 @@ describe("resolveWheelScroll", () => {
       })
     ).toEqual({
       nextScrollLeft: 170,
+      shouldConsume: true,
+    });
+  });
+
+  it("uses the page tabs wrapper metrics when resolving wheel scroll", () => {
+    expect(
+      resolvePageTabsWheel(
+        {
+          scrollLeft: 20,
+          clientWidth: 100,
+          scrollWidth: 500,
+        },
+        {
+          deltaX: 10,
+          deltaY: 30,
+          deltaMode: 0,
+        }
+      )
+    ).toEqual({
+      nextScrollLeft: 50,
       shouldConsume: true,
     });
   });
