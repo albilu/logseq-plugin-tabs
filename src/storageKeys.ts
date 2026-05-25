@@ -1,4 +1,3 @@
-import manifest from "../package.json";
 import { schemaVersion } from "../package.json";
 
 type LogseqBaseInfo = {
@@ -7,7 +6,7 @@ type LogseqBaseInfo = {
   };
 };
 
-const fallbackPluginId = manifest.logseq.id;
+const fallbackPluginId = "logseq-plugin-tabs-scrollable";
 
 export function getStorageKeyId(graph: string) {
   const pluginId = (globalThis as typeof globalThis & { logseq?: LogseqBaseInfo })

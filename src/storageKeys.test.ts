@@ -15,13 +15,13 @@ describe("getStorageKeyId", () => {
     );
   });
 
-  it("falls back to the manifest plugin id when runtime plugin id is unavailable", () => {
+  it("falls back to a fork-specific storage prefix when runtime plugin id is unavailable", () => {
     (globalThis as any).logseq = {
       baseInfo: {},
     };
 
     expect(getStorageKeyId("graph-path")).toBe(
-      "_pengx17-logseq-tabs:1.0.0/graph-path"
+      "logseq-plugin-tabs-scrollable:1.0.0/graph-path"
     );
   });
 });
