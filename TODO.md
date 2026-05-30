@@ -1,0 +1,2 @@
+-Enhance tabs styles (blend, no gap between tabs)
+-Add create new page button near Close All
