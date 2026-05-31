@@ -1,16 +1,16 @@
 .logseq-tab {
   @apply cursor-pointer font-sans select-none text-xs h-6 transition-all duration-100
-  flex items-center rounded mx-0.5 border border-1 light:border-gray-200 dark:border-gray-900
+  flex items-center mx-0 border-b border-r light:border-gray-300 dark:border-gray-700
     px-2 light:text-black dark:text-white;
 }
 
 .logseq-tab[data-active="false"] {
-  @apply light:(bg-cool-gray-100 text-gray-400 hover:text-black)
-         dark:(bg-cool-gray-800 text-gray-400 hover:text-white);
+  @apply light:(bg-transparent text-gray-500 hover:text-black hover:bg-cool-gray-200)
+         dark:(bg-transparent text-gray-400 hover:text-white hover:bg-cool-gray-800);
 }
 
 .logseq-tab[data-active="true"] {
-  @apply light:bg-cool-gray-300 dark:bg-cool-gray-900;
+  @apply light:bg-cool-gray-200 dark:bg-cool-gray-800;
 }
 
 .logseq-tab[data-dragging="true"] {
@@ -61,4 +61,11 @@
 
 .logseq-tab-wrapper:hover .close-all {
  opacity: 1;
+}
+
+html, body {
+  background-color: var(--ls-primary-background-color, #ffffff);
+}
+html[data-theme="dark"], html[data-theme="dark"] body {
+  background-color: var(--ls-primary-background-color, #1a202c);
 }

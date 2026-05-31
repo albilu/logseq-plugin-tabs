@@ -235,6 +235,19 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
             </div>
           );
         })}
+        <div
+          onClick={async () => {
+            const pageName = "New Page " + Date.now();
+            await logseq.Editor.createPage(pageName, {}, { redirect: true });
+          }}
+          key={"New Page"}
+          title="Create New Page"
+          draggable={false}
+          className="logseq-tab close-all group"
+          style={{ padding: "0 8px", fontSize: "1.2em" }}
+        >
+          <span className="logseq-tab-title">+</span>
+        </div>
         {!hideCloseAllButton && (
           <div
             onClick={() => onCloseAllTabs(true)}

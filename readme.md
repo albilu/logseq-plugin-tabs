@@ -1,6 +1,8 @@
 # Logseq Plugin Tabs Scrollable
 
-This project is a maintained fork of [`pengx17/logseq-plugin-tabs`](https://github.com/pengx17/logseq-plugin-tabs) that adds wheel scrolling for overflowing tabs while keeping the original tabbed-page workflow intact.
+This project is a maintained fork of [`pengx17/logseq-plugin-tabs`](https://github.com/pengx17/logseq-plugin-tabs) that adds:
+1. Wheel scrolling for overflowing tabs while keeping the original tabbed-page workflow intact.
+2. New tabs look like native logseq, and with create new page button near close all button.
 
 It helps you manage your working pages with tabs.
 
@@ -18,6 +20,7 @@ UX is mainly brought from modern browsers:
 ## Fork notes
 
 - Adds wheel scrolling for overflowing tabs in the tab bar.
+- Adds a "create new page" button near the "close all" button.
 - Preserves attribution to the upstream `pengx17/logseq-plugin-tabs` project.
 - Continues under the same MIT license lineage as the upstream project.
 
