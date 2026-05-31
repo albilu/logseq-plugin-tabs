@@ -1,3 +1,16 @@
+# [1.21.0](https://github.com/albilu/logseq-plugin-tabs/compare/v1.20.0...v1.21.0) (2026-05-31)
+
+
+### Bug Fixes
+
+* grant write permissions to semantic-release in GitHub Actions ([753701b](https://github.com/albilu/logseq-plugin-tabs/commit/753701b3b3ce168a7d0742f3ac24d9be0fd7f01e))
+
+
+### Features
+
+* add native-style tab designs and a new page creation button while updating dependencies and styles ([89de780](https://github.com/albilu/logseq-plugin-tabs/commit/89de7805d03122cc56296e41a4c22b486272883c))
+* add TODO for enhancing tab styles and new page button ([7983890](https://github.com/albilu/logseq-plugin-tabs/commit/79838907ec25cc66ea92c6d6550105bc204fcd80))
+
 ## [1.19.4](https://github.com/pengx17/logseq-plugin-tabs/compare/v1.19.3...v1.19.4) (2024-01-03)
 
 
