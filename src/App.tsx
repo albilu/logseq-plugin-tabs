@@ -1,8 +1,13 @@
 import React from "react";
+import type { SupportedLocale } from "./i18n";
 import { PageTabs } from "./PageTabs";
 import { usePreventFocus, useThemeMode } from "./utils";
 
-function App(): JSX.Element {
+type AppProps = {
+  locale: SupportedLocale;
+};
+
+function App({ locale }: AppProps): JSX.Element {
   const themeMode = useThemeMode();
   usePreventFocus();
   return (
@@ -13,7 +18,7 @@ function App(): JSX.Element {
       }}
       className={`${themeMode} drag-region`}
     >
-      <PageTabs />
+      <PageTabs locale={locale} />
     </main>
   );
 }

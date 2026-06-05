@@ -2,15 +2,28 @@ import "@logseq/libs";
 import React from "react";
 import * as ReactDOM from "react-dom/client";
 import "virtual:windi.css";
-import { settings } from "./settings";
+import { getLocaleFromUserConfigs, setCurrentLocale } from "./i18n";
+import { buildSettings } from "./settings";
 
 import App from "./App";
 import "./reset.css";
 import { isMac } from "./utils";
 
-function main() {
+export async function bootstrapLocaleSettings() {
+  const userConfigs = await logseq.App.getUserConfigs().catch(() => undefined);
+  const locale = await getLocaleFromUserConfigs(userConfigs);
+
+  setCurrentLocale(locale);
+  logseq.useSettingsSchema(buildSettings(locale));
+
+  return locale;
+}
+
+async function main() {
   const pluginId = logseq.baseInfo.id;
   console.info(`#${pluginId}: MAIN`);
+  const locale = await bootstrapLocaleSettings();
+
   const mac = isMac();
   logseq.provideStyle(`
   [data-active-keystroke=${mac ? "Meta" : "Control"} i]
@@ -22,7 +35,7 @@ function main() {
   const root = ReactDOM.createRoot(document.getElementById("app")!);
   root.render(
     <React.StrictMode>
-      <App />
+      <App locale={locale} />
     </React.StrictMode>
   );
 
@@ -34,4 +47,4 @@ function main() {
   console.info(`#${pluginId}: MAIN DONE`);
 }
 
-logseq.useSettingsSchema(settings).ready(main).catch(console.error);
+logseq.ready(main).catch(console.error);

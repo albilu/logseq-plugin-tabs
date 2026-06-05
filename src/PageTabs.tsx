@@ -10,6 +10,7 @@ import {
   clearCommandHandlers,
   registerCommandPaletteOnce,
 } from "./commandRegistry";
+import { SupportedLocale, t } from "./i18n";
 import { keyBindings } from "./settings";
 import { resolveWheelScroll } from "./tabStripWheel";
 import { ITabInfo } from "./types";
@@ -64,6 +65,7 @@ function isTabEqual(
 }
 
 interface TabsProps {
+  locale: SupportedLocale;
   tabs: ITabInfo[];
   closeButtonLeft: boolean;
   hideCloseAllButton: boolean;
@@ -80,6 +82,7 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
   (
     {
       activeTab,
+      locale,
       onClickTab,
       tabs,
       closeButtonLeft,
@@ -241,7 +244,7 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
             await logseq.Editor.createPage(pageName, {}, { redirect: true });
           }}
           key={"New Page"}
-          title="Create New Page"
+          title={t("tooltip.createNewPage", { locale })}
           draggable={false}
           className="logseq-tab close-all group"
           style={{ padding: "0 8px", fontSize: "1.2em" }}
@@ -255,7 +258,7 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
             draggable={false}
             className="logseq-tab close-all group"
           >
-            <span className="logseq-tab-title">Close All</span>
+            <span className="logseq-tab-title">{t("tabs.closeAll", { locale })}</span>
           </div>
         )}
         </div>
@@ -536,6 +539,7 @@ function registerKeybinding(
 }
 
 const useRegisterKeybindings = (
+  locale: SupportedLocale,
   key: keyof typeof keyBindings,
   cb: () => void
 ) => {
@@ -546,7 +550,7 @@ const useRegisterKeybindings = (
     if (userKeybinding.trim() !== "") {
       const setting = {
         key,
-        label: keyBindings[key].label,
+        label: t(keyBindings[key].labelKey, { locale }),
         keybinding: {
           binding: logseq.settings?.[key],
           mode: "global",
@@ -555,10 +559,13 @@ const useRegisterKeybindings = (
       registerKeybinding(setting, cbRef);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [cbRef, key, locale]);
 };
 
-const useRegisterSelectNthTabKeybindings = (cb: (nth: number) => void) => {
+const useRegisterSelectNthTabKeybindings = (
+  locale: SupportedLocale,
+  cb: (nth: number) => void
+) => {
   const cbRef = useEventCallback(cb);
 
   React.useEffect(() => {
@@ -566,7 +573,7 @@ const useRegisterSelectNthTabKeybindings = (cb: (nth: number) => void) => {
       const key = `tabs-select-nth-tab-${i}`;
       const setting = {
         key,
-        label: `Select tab ${i}`,
+        label: t("commands.selectTab", { locale, params: { index: i } }),
         keybinding: {
           binding: `mod+${i}`,
           mode: "non-editing",
@@ -577,17 +584,20 @@ const useRegisterSelectNthTabKeybindings = (cb: (nth: number) => void) => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [cbRef, locale]);
 };
 
-const useRegisterCloseAllButPins = (cb: (b: boolean) => void) => {
+const useRegisterCloseAllButPins = (
+  locale: SupportedLocale,
+  cb: (b: boolean) => void
+) => {
   const cbRef = useEventCallback(cb);
 
   React.useEffect(() => {
     registerKeybinding(
       {
         key: `tabs-close-all`,
-        label: `Close all tabs`,
+        label: t("commands.closeAll", { locale }),
         // no keybindings yet
       },
       () => {
@@ -595,13 +605,13 @@ const useRegisterCloseAllButPins = (cb: (b: boolean) => void) => {
       }
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [cbRef, locale]);
 
   React.useEffect(() => {
     registerKeybinding(
       {
         key: `tabs-close-others`,
-        label: `Close other tabs`,
+        label: t("commands.closeOthers", { locale }),
         // no keybindings yet
       },
       () => {
@@ -609,10 +619,14 @@ const useRegisterCloseAllButPins = (cb: (b: boolean) => void) => {
       }
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [cbRef, locale]);
 };
 
-export function PageTabs(): JSX.Element {
+type PageTabsProps = {
+  locale: SupportedLocale;
+};
+
+export function PageTabs({ locale }: PageTabsProps): JSX.Element {
   React.useEffect(() => {
     return () => {
       clearCommandHandlers(parent.window, logseq.baseInfo.id);
@@ -816,41 +830,42 @@ export function PageTabs(): JSX.Element {
     }
   }, [activeTab, ref]);
 
-  useRegisterKeybindings("tabs:toggle-pin", () => {
+  useRegisterKeybindings(locale, "tabs:toggle-pin", () => {
     if (currActiveTabRef.current) {
       onPinTab(currActiveTabRef.current);
     }
   });
 
-  useRegisterKeybindings("tabs:close", () => {
+  useRegisterKeybindings(locale, "tabs:close", () => {
     if (currActiveTabRef.current) {
       onCloseTab(currActiveTabRef.current);
     }
   });
 
-  useRegisterKeybindings("tabs:select-next", () => {
+  useRegisterKeybindings(locale, "tabs:select-next", () => {
     let idx = getCurrentActiveIndex() ?? -1;
     idx = (idx + 1) % tabs.length;
     onChangeTab(tabs[idx]);
   });
 
-  useRegisterKeybindings("tabs:select-prev", () => {
+  useRegisterKeybindings(locale, "tabs:select-prev", () => {
     let idx = getCurrentActiveIndex() ?? -1;
     idx = (idx - 1 + tabs.length) % tabs.length;
     onChangeTab(tabs[idx]);
   });
 
-  useRegisterSelectNthTabKeybindings((idx) => {
+  useRegisterSelectNthTabKeybindings(locale, (idx) => {
     if (idx > 0 && idx <= tabs.length) {
       onChangeTab(tabs[idx - 1]);
     }
   });
 
-  useRegisterCloseAllButPins(onCloseAllTabs);
+  useRegisterCloseAllButPins(locale, onCloseAllTabs);
 
   return (
     <Tabs
       ref={ref}
+      locale={locale}
       onClickTab={onTabClick}
       activeTab={activeTab}
       tabs={tabs}
