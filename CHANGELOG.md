@@ -1,3 +1,10 @@
+# [1.22.0](https://github.com/albilu/logseq-plugin-tabs/compare/v1.21.0...v1.22.0) (2026-06-05)
+
+
+### Features
+
+* **i18n:** add localization support for multiple languages ([2a6603a](https://github.com/albilu/logseq-plugin-tabs/commit/2a6603ae1988b80eeb84ff960ea4baf9d5f51f92))
+
 # [1.21.0](https://github.com/albilu/logseq-plugin-tabs/compare/v1.20.0...v1.21.0) (2026-05-31)
 
 
