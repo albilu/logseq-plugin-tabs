@@ -42,6 +42,7 @@
     "windicss": "3.5.6"
   },
   "logseq": {
-    "id": "_logseq-plugin-tabs-scrollable"
+    "id": "_logseq-plugin-tabs-scrollable",
+    "icon": "./icon.png"
   }
 }
