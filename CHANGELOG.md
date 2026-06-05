@@ -1,3 +1,11 @@
+## [1.22.1](https://github.com/albilu/logseq-plugin-tabs/compare/v1.22.0...v1.22.1) (2026-06-05)
+
+
+### Bug Fixes
+
+* add docs directory to .gitignore ([110443e](https://github.com/albilu/logseq-plugin-tabs/commit/110443e365799c8572bec73a76b20a095d137471))
+* add missing plugin icon to logseq config and release zip ([a2b10d0](https://github.com/albilu/logseq-plugin-tabs/commit/a2b10d094bd33f5d14c6ac7be427d9157e11eda3))
+
 # [1.22.0](https://github.com/albilu/logseq-plugin-tabs/compare/v1.21.0...v1.22.0) (2026-06-05)
 
 
